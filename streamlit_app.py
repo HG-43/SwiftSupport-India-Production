@@ -40,7 +40,8 @@ st.markdown("""
         background-color: var(--secondary-background-color) !important;
         border: 1px solid rgba(128, 128, 128, 0.15) !important;
         border-radius: 12px !important;
-        padding: 26px !important;
+        padding: 24px !important;
+        margin-bottom: 24px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
     }
 
@@ -54,7 +55,6 @@ st.markdown("""
         font-size: 0.9rem !important;
         padding: 0.55rem 2rem !important;
         box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2) !important;
-        transition: background-color 0.15s ease !important;
     }
     button[kind="primary"]:hover {
         background-color: #1d4ed8 !important;
@@ -70,7 +70,6 @@ st.markdown("""
         font-size: 0.85rem !important;
         font-weight: 500 !important;
         width: 100% !important;
-        transition: all 0.15s ease-in-out !important;
     }
     button[kind="secondary"]:hover {
         background-color: rgba(37, 99, 235, 0.08) !important;
@@ -91,7 +90,7 @@ st.markdown("""
         border-radius: 6px !important;
     }
 
-    /* 8. Crisp Live System Badge */
+    /* 8. Clean Operational Status Elements */
     .status-badge {
         display: inline-flex;
         align-items: center;
@@ -110,6 +109,49 @@ st.markdown("""
         background-color: #10b981;
         border-radius: 50%;
         margin-right: 8px;
+    }
+
+    /* =========================================================================
+       FIXED CORNER ASSISTANT: Pinpoints width boundaries to block spreading
+       ========================================================================= */
+    div[data-testid="stPopover"] {
+        position: fixed !important;
+        bottom: 30px !important;
+        right: 30px !important;
+        width: auto !important;
+        max-width: 240px !important;
+        z-index: 999999 !important;
+    }
+    
+    /* Targets the button directly to secure a small, premium rounded pill */
+    div[data-testid="stPopover"] > button {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        color: #ffffff !important;
+        border-radius: 50px !important;
+        padding: 10px 22px !important;
+        width: auto !important;
+        max-width: 240px !important;
+        height: auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3) !important;
+        border: none !important;
+        transition: transform 0.2s ease !important;
+    }
+    div[data-testid="stPopover"] > button:hover {
+        transform: scale(1.03) translateY(-1px);
+    }
+    
+    /* Hides default Streamlit dropdown arrows that stretch out text boxes */
+    div[data-testid="stPopover"] button svg {
+        display: none !important;
+    }
+    
+    div[data-testid="stPopoverWindow"] {
+        width: 375px !important;
+        border-radius: 16px !important;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -132,7 +174,7 @@ else:
 
 client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)
 
-# --- SIDEBAR PANEL ---
+# --- SIDEBAR PANEL (Native Icons Fixed) ---
 with st.sidebar:
     st.header("Operations Desk")
     st.markdown('<div class="status-badge"><div class="status-dot"></div>Fulfillment Active</div>', unsafe_allow_html=True)
@@ -144,15 +186,14 @@ with st.sidebar:
         else:
             st.caption("Logistics policy file not found.")
 
-# --- NAVIGATION FLOW: INTEGRATED DROPDOWN SELECTOR ---
+# --- NAVIGATION FLOW: DROPDOWN FOR CORE TOOLS ---
 user_intent = st.selectbox(
     "Select an issue category to begin execution:",
     [
         "Select your issue category...",
         "Calculate Order Return & Restocking Fee",
         "Track Dispatch Carrier & Delivery Network",
-        "Review Store Fulfillment Guidelines",
-        "Open Order Support Desk Chat"
+        "Review Store Fulfillment Guidelines"
     ]
 )
 
@@ -220,67 +261,66 @@ elif user_intent == "Review Store Fulfillment Guidelines":
         policy = knowledge_rag.retrieve_domain_context("return policy window")
         st.info(policy)
 
-# VIEW 4: Help Desk Chat Support
-elif user_intent == "Open Order Support Desk Chat":
-    with st.container(border=True):
-        st.subheader("Order Support Desk")
-        st.write("Select a quick-inquiry dispatch chip or submit an order question below:")
-        
-        # SUGGESTION CHIPS (Sleek minimalist secondary triggers)
-        chip_col1, chip_col2, chip_col3 = st.columns(3)
-        chosen_suggestion = None
-        
-        with chip_col1:
-            if st.button("⏱️ Return Timeline", type="secondary"):
-                chosen_suggestion = "What is the official return policy timeline window?"
-        with chip_col2:
-            if st.button("📦 Damaged Box Fee", type="secondary"):
-                chosen_suggestion = "What is the fee if my product packaging box is missing?"
-        with chip_col3:
-            if st.button("🚚 Courier Services", type="secondary"):
-                chosen_suggestion = "Which domestic courier services do you use inside India?"
-                
-        st.markdown("---")
-        
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
+
+# =========================================================================
+# COMPACT FLOATING ASSISTANT WIDGET (Bottom Right Corner)
+# =========================================================================
+with st.popover("💬 Try Swifty AI"):
+    st.markdown("### 🤖 Swifty AI Support")
+    st.write("Select a quick-inquiry chip or submit an order question below:")
+    st.markdown("---")
+    
+    chip_col1, chip_col2 = st.columns(2)
+    chosen_suggestion = None
+    
+    with chip_col1:
+        if st.button("⏱️ Return Timeline", type="secondary"):
+            chosen_suggestion = "What is the official return policy timeline window?"
+    with chip_col2:
+        if st.button("📦 Damaged Box Fee", type="secondary"):
+            chosen_suggestion = "What is the fee if my product packaging box is missing?"
             
-        history_slot = st.container()
+    st.markdown("---")
+    
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        
+    history_slot = st.container()
+    
+    with history_slot:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+                
+    chat_input = st.chat_input("Ask a question about your order...")
+    active_query = chat_input or chosen_suggestion
+    
+    if active_query:
+        with history_slot:
+            with st.chat_message("user"):
+                st.markdown(active_query)
+        
+        with st.spinner("Accessing fulfillment files..."):
+            ctx = knowledge_rag.retrieve_domain_context(active_query)
+            sys_prompt = f"{base_system}\n\nPOLICY CONTEXT:\n{ctx}"
+            
+            try:
+                res = client.chat.completions.create(
+                    model=PRIMARY_MODEL,
+                    messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": active_query}]
+                )
+                ans = res.choices[0].message.content
+            except:
+                res = client.chat.completions.create(
+                    model=FALLBACK_MODEL,
+                    messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": active_query}]
+                )
+                ans = res.choices[0].message.content
         
         with history_slot:
-            for msg in st.session_state.messages:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-                    
-        chat_input = st.chat_input("Ask a question about your shipment or order status...")
-        active_query = chat_input or chosen_suggestion
-        
-        if active_query:
-            with history_slot:
-                with st.chat_message("user"):
-                    st.markdown(active_query)
-            
-            with st.spinner("Accessing fulfillment files..."):
-                ctx = knowledge_rag.retrieve_domain_context(active_query)
-                sys_prompt = f"{base_system}\n\nPOLICY CONTEXT:\n{ctx}"
+            with st.chat_message("assistant"):
+                st.markdown(ans)
                 
-                try:
-                    res = client.chat.completions.create(
-                        model=PRIMARY_MODEL,
-                        messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": active_query}]
-                    )
-                    ans = res.choices[0].message.content
-                except:
-                    res = client.chat.completions.create(
-                        model=FALLBACK_MODEL,
-                        messages=[{"role": "system", "content": sys_prompt}, {"role": "user", "content": active_query}]
-                    )
-                    ans = res.choices[0].message.content
-            
-            with history_slot:
-                with st.chat_message("assistant"):
-                    st.markdown(ans)
-                    
-            st.session_state.messages.append({"role": "user", "content": active_query})
-            st.session_state.messages.append({"role": "assistant", "content": ans})
-            st.rerun()
+        st.session_state.messages.append({"role": "user", "content": active_query})
+        st.session_state.messages.append({"role": "assistant", "content": ans})
+        st.rerun()
