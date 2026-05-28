@@ -1,0 +1,23 @@
+# Python Runtime Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local Python Virtual Environments
+venv/
+env/
+ENV/
+
+# Local Operational Logs & Telemetry Data (Do not commit scale logs)
+*.jsonl
+*.log
+
+# IDE Configurations
+.vscode/
+.idea/
+
+# System Files
+.DS_Store
+Thumbs.db
