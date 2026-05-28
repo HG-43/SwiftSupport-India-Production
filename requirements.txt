@@ -1,6 +1,6 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2+cpu
 streamlit
 openai
 chromadb
 sentence-transformers
+pysqlite3-binary
+protobuf==3.20.3

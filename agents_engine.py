@@ -18,7 +18,7 @@ def process_agent_workflow(api_key, user_query, uploaded_image_file=None):
         mime = uploaded_image_file.type
         
         vision_prompt = (
-            "You are Swifty, the AI assistant for SwiftSupport India. "
+            "You are the Visual Triage Agent for SwiftSupport India. "
             "Analyze the image provided and discuss any packaging or product damage with the user "
             "in a professional and conversational manner."
         )
@@ -61,23 +61,22 @@ def process_agent_workflow(api_key, user_query, uploaded_image_file=None):
 
     if "FINANCE" in route_decision:
         agent_system = (
-            "You are Swifty, handling finance for SwiftSupport India. Be conversational, polite, and brief (max 3 sentences). "
+            "You are the Finance Agent for SwiftSupport India. Be conversational, polite, and brief (max 3 sentences). "
             "Help the user address their monetary or refund question naturally using this policy manual context:\n"
             f"{semantic_context}\n\n"
             "CRITICAL RULE: Do NOT automatically bring up a late 30-day return window penalty unless the user explicitly "
             "states they are trying to return an old item."
         )
-        # RENAMED LABEL
-        agent_label = "💰 Swifty"
+        agent_label = "💰 Finance Agent"
     else:
         agent_system = (
-            "You are Swifty, handling logistics for SwiftSupport India. Be conversational, polite, and brief (max 3 sentences). "
+            "You are the Logistics Agent for SwiftSupport India. Be conversational, polite, and brief (max 3 sentences). "
             "Help the user address their shipment delivery tracking status or transit delays naturally using this context:\n"
             f"{semantic_context}\n\n"
-            "CRITICAL RULE: If the user says 'it is late' or 'delayed', assume they are asking about an active shipping arrival transit hold."
+            "CRITICAL RULE: If the user says 'it is late' or 'delayed', assume they are asking about an active shipping arrival transit hold, "
+            "not a product return timeframe rule."
         )
-        # RENAMED LABEL
-        agent_label = "🚚 Swifty"
+        agent_label = "🚚 Logistics Agent"
 
     response = client.chat.completions.create(
         model=TEXT_MODEL,
